@@ -1,0 +1,10 @@
+#include <string.h>
+#include "wow.h"
+
+using namespace std;
+
+int main()
+{
+	//This print the great Hello World
+	cout << "Hello World";
+}
