@@ -280,25 +280,40 @@ void generateSymbolTable(string file_name)
                 inFor = true;
             if (inFor && currSymbol == ")")
                 inFor = false;
+            
             if (identifyToken(currSymbol, parantheses))
             {
+                bool skip = false;
                 if (!parStack.empty())
                 {
                     if (currSymbol == ")" && parStack.top().first == "(")
-                        parStack.pop();
+                    {
+                        skip = true;
+                    }
                     else if (currSymbol == "}" && parStack.top().first == "{")
-                        parStack.pop();
+                    {
+                        skip = true;
+                    }
                     else if (currSymbol == "]" && parStack.top().first == "[")
-                        parStack.pop();
+                    {
+                        skip = true;
+                    }
                 }
-                parStack.push(make_pair(currSymbol, lineNum));
+                if (skip)
+                {
+                    parStack.pop();
+                }
+                else
+                {
+                    parStack.push(make_pair(currSymbol, lineNum));
+                }
             }
 
             if (currSymbol == "if")
             {
                 if (prevSymbol == "else")
                 {
-                    if (ifStack.top().first != "else if" || ifStack.top().second != findScope())
+                    if ((ifStack.top().first != "else if" || ifStack.top().first != "if" ) && ifStack.top().second != findScope())
                     {
                         errors.push_back(make_pair("\nMismatched token 'else if' at line: ", lineNum));
                     }
@@ -319,10 +334,6 @@ void generateSymbolTable(string file_name)
                 {
                     errors.push_back(make_pair("\nUnmatched 'else' at line: ", lineNum));
                 }
-                else if (ifStack.top().first == "else")
-                {
-                    errors.push_back(make_pair("\nUnmatched 'else' at line: ", lineNum));
-                }
                 else
                 {
                     while (!ifStack.empty())
@@ -334,15 +345,14 @@ void generateSymbolTable(string file_name)
 
             if (((!inFor && currToken.substr(0, 3) == "sep") || currToken.substr(0, 2) == "kw") && currSymbol == prevSymbol)
             {
-                errors.push_back(make_pair("\nDuplicate token " + currSymbol + " at line: ", lineNum));
+                errors.push_back(make_pair("\nDuplicate token/keyword " + currSymbol + " at line: ", lineNum));
             }
-
-            if (currToken.substr(0, 2) == "id" && prevToken.substr(0, 2) == "kw" &&
+            else if (currToken.substr(0, 2) == "id" && prevToken.substr(0, 2) == "kw" &&
                 prevSymbol != "return" && prevSymbol != "else")
             {
                 if (lookupSymbolTable(currSymbol, "var", idScope) != -1)
                 {
-                    errors.push_back(make_pair("\nDuplicate Identifier " + currSymbol + " declared in line: ", lineNum));
+                    errors.push_back(make_pair("\nRe-declaration of identifier " + currSymbol + " at line: ", lineNum));
                 }
                 else
                 {
