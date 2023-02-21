@@ -1,0 +1,13 @@
+#include<stdio.h>
+void main(void))
+{
+    int a,b,c;
+    float d[10], e , f[] = {1.5, 3.2};
+    char x,y,z;
+    scanf("%d%f%c",&a,&e,&x);
+    printf("char %c float %f",x,e);
+    if(a<=5) {{ printf(“Hi”); // <= Rel-op 
+    }
+    else if (b<5 && a==4) 
+    scanf("%d%d",&b,&c);
+}
